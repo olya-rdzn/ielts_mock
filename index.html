@@ -85,7 +85,7 @@
             font-family: inherit;
             cursor: pointer;
             outline: none;
-            min-width: 240px;
+            min-width: 280px;
             transition: border-color 0.2s;
         }
         .test-picker select:focus,
@@ -625,7 +625,7 @@
 <header class="top-bar">
     <div class="brand">
         <span class="brand-badge">Listening Lab</span>
-        <h1 id="pageTitle">Classroom Listening Practice</h1>
+        <h1 id="pageTitle">Mock Test IELTS</h1>
     </div>
     <div class="controls-right">
         <div class="test-picker">
@@ -643,7 +643,7 @@
 <div class="status-banner" id="statusBanner"></div>
 
 <div class="container" id="mainContainer">
-    <!-- LEFT: STICKY VIDEO + CUE CARD -->
+    <!-- LEFT: STICKY VIDEO + CUE CARD (hidden automatically if no youtubeId) -->
     <div class="video-column" id="videoColumn">
         <div class="video-wrapper">
             <iframe
@@ -709,6 +709,15 @@
         banner.className = 'status-banner ' + type;
     }
 
+    // ---------- LABEL HELPER: "Listening – Title (Level)" ----------
+    function labelFor(t) {
+        const prefix = t.type
+            ? t.type[0].toUpperCase() + t.type.slice(1) + ' – '
+            : '';
+        const suffix = t.level ? ' (' + t.level + ')' : '';
+        return prefix + t.title + suffix;
+    }
+
     // ---------- LOAD MANIFEST (mocks/index.json) ----------
     async function initApp() {
         const select = document.getElementById('mockSelect');
@@ -724,13 +733,20 @@
                 return;
             }
 
-            select.innerHTML = tests.map(t =>
-                `<option value="${escapeHtml(t.file)}">${escapeHtml(t.title)}${t.level ? ' (' + escapeHtml(t.level) + ')' : ''}</option>`
+            // Sort alphabetically by displayed label, so Listening groups before Reading
+            const sorted = [...tests].sort((a, b) =>
+                labelFor(a).localeCompare(labelFor(b), undefined, { sensitivity: 'base' })
+            );
+
+            select.innerHTML = sorted.map(t =>
+                `<option value="${escapeHtml(t.file)}">${escapeHtml(labelFor(t))}</option>`
             ).join('');
 
             const params = new URLSearchParams(window.location.search);
             const requestedFile = params.get('test');
-            const initialTest = tests.find(t => t.file === requestedFile) ? requestedFile : tests[0].file;
+            const initialTest = sorted.find(t => t.file === requestedFile)
+                ? requestedFile
+                : sorted[0].file;
 
             select.value = initialTest;
             select.addEventListener('change', () => {
@@ -768,12 +784,27 @@
     // ---------- RENDER MOCK TEST ----------
     function renderMock(data) {
         document.title = `Mock Test IELTS · ${data.title || 'Practice'}`;
-        document.getElementById('pageTitle').textContent = `Classroom Listening Practice · ${data.title || ''}`;
+        document.getElementById('pageTitle').textContent = `Mock Test IELTS · ${data.title || ''}`;
 
+        // ---- Video pane: optional youtubeId ----
         const videoId = data.youtubeId || '';
-        document.getElementById('videoFrame').src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?rel=0`;
-        document.getElementById('youtubeDirectLink').href = `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
+        const videoCol = document.getElementById('videoColumn');
+        const resizer  = document.getElementById('resizer');
 
+        if (videoId) {
+            videoCol.style.display = '';
+            resizer.style.display = '';
+            document.getElementById('videoFrame').src =
+                `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?rel=0`;
+            document.getElementById('youtubeDirectLink').href =
+                `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
+        } else {
+            videoCol.style.display = 'none';
+            resizer.style.display = 'none';
+            document.getElementById('videoFrame').src = 'about:blank';
+        }
+
+        // ---- Cues ----
         const cueCard = document.getElementById('cueCard');
         const cueList = document.getElementById('cueList');
         if (Array.isArray(data.cues) && data.cues.length > 0) {
@@ -785,6 +816,7 @@
             cueCard.style.display = 'none';
         }
 
+        // ---- Exercises ----
         const container = document.getElementById('exercisesContainer');
         container.innerHTML = '';
 
@@ -1041,12 +1073,14 @@
         let isDragging = false;
         let startX = 0;
         let startVideoWidth = 0;
-        let startExerciseWidth = 0;
         let savedNormalVideoWidth = 460;
 
         function setVideoWidth(newWidth) {
+            // Guard: don't try to resize if video pane is hidden (e.g. Reading test)
+            if (videoCol.style.display === 'none') return;
+
             const containerWidth = container.getBoundingClientRect().width;
-            const minVideoWidth = 160;     // Allows video column to shrink very small
+            const minVideoWidth = 160;
             const minExerciseWidth = 280;
             const maxVideoWidth = containerWidth - minExerciseWidth - 14;
 
@@ -1062,6 +1096,7 @@
         }
 
         function toggleWideQuestions() {
+            if (videoCol.style.display === 'none') return;
             const currentWidth = videoCol.getBoundingClientRect().width;
             if (currentWidth > 260) {
                 savedNormalVideoWidth = currentWidth;
@@ -1075,10 +1110,10 @@
         resizer.addEventListener('dblclick', toggleWideQuestions);
 
         function startDrag(clientX) {
+            if (videoCol.style.display === 'none') return;
             isDragging = true;
             startX = clientX;
             startVideoWidth = videoCol.getBoundingClientRect().width;
-            startExerciseWidth = exerciseCol.getBoundingClientRect().width;
             resizer.classList.add('dragging');
             document.body.style.userSelect = 'none';
         }
