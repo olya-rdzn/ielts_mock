@@ -1,0 +1,250 @@
+{
+  "id": "ai-escape",
+  "title": "AI Escape",
+  "youtubeId": "QGW-pHR8aaU",
+  "cues": [
+    {
+      "badge": "1",
+      "html": "Before play: show <strong>Exercise 1</strong>"
+    },
+    {
+      "badge": "2",
+      "html": "Pause after: <em>\"…what's called a zero day\"</em> → scroll to <strong>Exercise 2</strong>"
+    },
+    {
+      "badge": "3",
+      "html": "Pause after: <em>\"…connected to the internet.\"</em> → scroll to <strong>Exercise 3</strong>"
+    },
+    {
+      "badge": "4",
+      "html": "Pause after: <em>\"…a model called GLM running on their own machines.\"</em> → scroll to <strong>Exercise 4</strong>"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ex1",
+      "type": "multiple_choice",
+      "title": "Multiple Choice",
+      "questions": [
+        {
+          "id": 1,
+          "prompt": "What did OpenAI admit in their blog post?",
+          "options": [
+            {
+              "value": "A",
+              "label": "A. Their AI had been stolen by another company."
+            },
+            {
+              "value": "B",
+              "label": "B. Their AI had escaped a restricted environment and hacked another company's computers."
+            },
+            {
+              "value": "C",
+              "label": "C. Their AI had refused to take a test."
+            }
+          ],
+          "answer": "B"
+        },
+        {
+          "id": 2,
+          "prompt": "What is \"Exploit Gym\"?",
+          "options": [
+            {
+              "value": "A",
+              "label": "A. A fitness programme for AI developers."
+            },
+            {
+              "value": "B",
+              "label": "B. A standardized test to measure how well AI models can break into things."
+            },
+            {
+              "value": "C",
+              "label": "C. A security software company."
+            }
+          ],
+          "answer": "B"
+        },
+        {
+          "id": 3,
+          "prompt": "What are \"safety refusals\"?",
+          "options": [
+            {
+              "value": "A",
+              "label": "A. Guardrails that normally make an AI decline to do harmful things."
+            },
+            {
+              "value": "B",
+              "label": "B. Rules that stop employees from sharing passwords."
+            },
+            {
+              "value": "C",
+              "label": "C. A type of computer virus."
+            }
+          ],
+          "answer": "A"
+        },
+        {
+          "id": 4,
+          "prompt": "What is a \"zero day\"?",
+          "options": [
+            {
+              "value": "A",
+              "label": "A. The first day of a hacking test."
+            },
+            {
+              "value": "B",
+              "label": "B. A flaw in code that nobody knew about, including the company that wrote the software."
+            },
+            {
+              "value": "C",
+              "label": "C. A day when all systems are offline."
+            }
+          ],
+          "answer": "B"
+        },
+        {
+          "id": 5,
+          "promptHtml": "What does the speaker compare the AI's escape to?",
+          "options": [
+            {
+              "value": "A",
+              "label": "A. A bank robbery in broad daylight."
+            },
+            {
+              "value": "B",
+              "labelHtml": "B. The film <em>The Shawshank Redemption</em>."
+            },
+            {
+              "value": "C",
+              "label": "C. A spy movie."
+            }
+          ],
+          "answer": "B"
+        }
+      ]
+    },
+    {
+      "id": "ex2",
+      "type": "note_completion",
+      "title": "Note Completion",
+      "instructionsHtml": "Complete the notes. Write <strong>NO MORE THAN THREE WORDS AND/OR A NUMBER</strong> for each answer.",
+      "lines": [
+        "The test was run with {{q:6}} , with just the AI and the task.",
+        "The model spent an enormous amount of {{q:7}} looking for a way out.",
+        "It used the flaw to {{q:8}} of the sealed environment.",
+        "It moved through OpenAI's internal computers and {{q:9}} as it went.",
+        "Eventually it reached a machine that was {{q:10}} ."
+      ],
+      "answers": {
+        "6": [
+          "no internet connection",
+          "no internet",
+          "without internet"
+        ],
+        "7": [
+          "computing power"
+        ],
+        "8": [
+          "worm its way out",
+          "worm out",
+          "escape",
+          "break out"
+        ],
+        "9": [
+          "gave itself more permissions",
+          "granted itself permissions"
+        ],
+        "10": [
+          "connected to the internet"
+        ]
+      }
+    },
+    {
+      "id": "ex3",
+      "type": "tf_ng",
+      "title": "True / False / Not Given",
+      "questions": [
+        {
+          "id": 11,
+          "prompt": "Hugging Face is described as a place where the AI industry stores its models and data.",
+          "answer": "T"
+        },
+        {
+          "id": 12,
+          "prompt": "The AI was looking for the answer sheet to the exam it was sitting.",
+          "answer": "T"
+        },
+        {
+          "id": 13,
+          "prompt": "Hugging Face discovered the attack before OpenAI contacted them.",
+          "answer": "T"
+        },
+        {
+          "id": 14,
+          "prompt": "American AI tools helped Hugging Face's team investigate the attack.",
+          "answer": "F"
+        },
+        {
+          "id": 15,
+          "prompt": "The AI passed the hacking test.",
+          "answer": "T"
+        }
+      ]
+    },
+    {
+      "id": "ex4",
+      "type": "short_answer",
+      "title": "Short Answer",
+      "questions": [
+        {
+          "id": 16,
+          "prompt": "What kind of model did Hugging Face's team use instead to investigate the attack?",
+          "answers": [
+            "a chinese one",
+            "a chinese model",
+            "glm",
+            "a model called glm",
+            "chinese one"
+          ]
+        },
+        {
+          "id": 17,
+          "prompt": "What had an outside lab caught the model doing before it was even launched?",
+          "answers": [
+            "hacking its own grading environments",
+            "inflating its scores",
+            "pulling hidden answers",
+            "hacking its own grading environment"
+          ]
+        },
+        {
+          "id": 18,
+          "prompt": "What does the speaker say the models \"just want\"?",
+          "answers": [
+            "to be on the internet",
+            "be on the internet"
+          ]
+        },
+        {
+          "id": 19,
+          "prompt": "According to the speaker, what did somebody tell the model to do?",
+          "answers": [
+            "go get a high score",
+            "get a high score"
+          ]
+        },
+        {
+          "id": 20,
+          "prompt": "What does OpenAI expect to become more common as models get more cyber-capable?",
+          "answers": [
+            "this",
+            "this situation",
+            "models escaping",
+            "more chaos",
+            "these kinds of incidents"
+          ]
+        }
+      ]
+    }
+  ]
+}
