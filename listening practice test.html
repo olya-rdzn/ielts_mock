@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Listening Practice · AI Escape</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f4f7fc;
+            color: #1a2639;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            display: flex;
+            gap: 0;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        /* ---------- LEFT: STICKY VIDEO COLUMN ---------- */
+        .video-column {
+            flex: 0 0 560px;
+            min-width: 280px;
+            position: sticky;
+            top: 24px;
+            align-self: flex-start;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-right: 14px;
+        }
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background: #000;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .video-fallback {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #1e2b3c;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            gap: 12px;
+            border-radius: 20px;
+        }
+        .video-fallback p {
+            font-size: 0.95rem;
+            opacity: 0.85;
+            max-width: 360px;
+        }
+        .video-fallback a {
+            display: inline-block;
+            background: #2d6cdf;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+        .video-fallback a:hover {
+            background: #1e5bc4;
+        }
+        .cue-card {
+            background: #1e2b3c;
+            color: #eef4ff;
+            padding: 16px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .cue-card h4 {
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            margin-bottom: 8px;
+            color: #9fc9ff;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .cue-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .cue-card li {
+            display: flex;
+            gap: 10px;
+        }
+        .cue-card .badge {
+            background: #3b5b8c;
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            color: #fff;
+            align-self: center;
+        }
+
+        /* ---------- DRAG RESIZER ---------- */
+        .resizer {
+            flex: 0 0 10px;
+            width: 10px;
+            cursor: col-resize;
+            background: transparent;
+            position: relative;
+            align-self: stretch;
+            min-height: 200px;
+            touch-action: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .resizer::after {
+            content: '';
+            width: 4px;
+            height: 60px;
+            background: #cbd6e6;
+            border-radius: 4px;
+            transition: background 0.2s, height 0.2s;
+        }
+        .resizer:hover::after,
+        .resizer.dragging::after {
+            background: #2d6cdf;
+            height: 100px;
+        }
+
+        /* ---------- RIGHT: SCROLLABLE EXERCISES ---------- */
+        .exercise-column {
+            flex: 1 1 500px;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-height: calc(100vh - 48px);
+            overflow-y: auto;
+            padding-right: 8px;
+            padding-left: 14px;
+            scroll-behavior: smooth;
+        }
+        .exercise-column::-webkit-scrollbar {
+            width: 8px;
+        }
+        .exercise-column::-webkit-scrollbar-track {
+            background: #e9eef5;
+            border-radius: 10px;
+        }
+        .exercise-column::-webkit-scrollbar-thumb {
+            background: #b7c7db;
+            border-radius: 10px;
+        }
+        .exercise-column::-webkit-scrollbar-thumb:hover {
+            background: #8fa6c2;
+        }
+
+        .exercise-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px 24px 18px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid #dfe7f0;
+            transition: border-color 0.2s;
+            flex-shrink: 0;
+        }
+        .exercise-card.active {
+            border-color: #2d6cdf;
+            box-shadow: 0 8px 24px rgba(45, 108, 223, 0.15);
+        }
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .exercise-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e2b3c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .exercise-title span {
+            background: #1e2b3c;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 40px;
+            padding: 3px 12px;
+        }
+        .score-badge {
+            background: #e8f0fe;
+            color: #2d6cdf;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 4px 14px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            display: none;
+        }
+        .score-badge.visible {
+            display: inline-block;
+        }
+
+        /* ---------- INTERACTIVE SELECTABLE BUTTONS ---------- */
+        .question-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .question-list li {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            padding: 4px 0;
+        }
+        .q-text {
+            display: flex;
+            gap: 12px;
+            font-weight: 500;
+        }
+        .q-num {
+            font-weight: 700;
+            color: #2d6cdf;
+            min-width: 26px;
+        }
+        .option-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-left: 38px;
+        }
+        .option-buttons button {
+            padding: 8px 20px;
+            border-radius: 40px;
+            border: 1.5px solid #cbd6e6;
+            background: #fff;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: #3a4b60;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+            text-align: left;
+            line-height: 1.3;
+            max-width: 100%;
+        }
+        .option-buttons button:hover {
+            border-color: #2d6cdf;
+            color: #2d6cdf;
+        }
+        .option-buttons button.selected {
+            background: #2d6cdf;
+            border-color: #2d6cdf;
+            color: #fff;
+        }
+        .option-buttons button.correct {
+            background: #1e9e5a;
+            border-color: #1e9e5a;
+            color: #fff;
+        }
+        .option-buttons button.wrong {
+            background: #d13b3b;
+            border-color: #d13b3b;
+            color: #fff;
+        }
+        .option-buttons button.correct.selected,
+        .option-buttons button.wrong.selected {
+            opacity: 1;
+        }
+        .feedback-text {
+            margin-left: 38px;
+            font-size: 0.85rem;
+            color: #1e9e5a;
+            display: none;
+            font-weight: 500;
+        }
+        .feedback-text.visible {
+            display: block;
+        }
+        .feedback-text.wrong-feedback {
+            color: #d13b3b;
+        }
+
+        /* Note completion specific */
+        .note-line {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #2c3e50;
+        }
+        .note-line p {
+            margin-bottom: 10px;
+        }
+        .note-line .blank {
+            display: inline-block;
+            min-width: 120px;
+            margin: 0 4px;
+            padding: 0 2px;
+        }
+        .note-line .blank input {
+            width: 130px;
+            padding: 6px 8px;
+            border: 1.5px solid #cbd6e6;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .note-line .blank input:focus {
+            border-color: #2d6cdf;
+        }
+        .note-line .blank .inline-mark {
+            font-weight: 700;
+            margin-left: 4px;
+            display: none;
+        }
+        .note-line .blank .inline-mark.visible {
+            display: inline;
+        }
+        .note-line .blank .inline-mark.correct { color: #1e9e5a; }
+        .note-line .blank .inline-mark.wrong { color: #d13b3b; }
+
+        /* T/F/NG specific */
+        .tf-ng-row {
+            display: flex;
+            gap: 8px;
+            margin-left: 38px;
+            margin-top: 2px;
+            flex-wrap: wrap;
+        }
+        .tf-ng-row button {
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 1.5px solid #cbd6e6;
+            background: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #3a4b60;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .tf-ng-row button:hover {
+            border-color: #2d6cdf;
+            color: #2d6cdf;
+        }
+        .tf-ng-row button.selected {
+            background: #2d6cdf;
+            border-color: #2d6cdf;
+            color: #fff;
+        }
+        .tf-ng-row button.correct {
+            background: #1e9e5a;
+            border-color: #1e9e5a;
+            color: #fff;
+        }
+        .tf-ng-row button.wrong {
+            background: #d13b3b;
+            border-color: #d13b3b;
+            color: #fff;
+        }
+        .tf-ng-row button.correct.selected,
+        .tf-ng-row button.wrong.selected {
+            opacity: 1;
+        }
+        .tf-feedback {
+            margin-left: 38px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 2px;
+            display: none;
+        }
+        .tf-feedback.visible {
+            display: block;
+        }
+        .tf-feedback.correct { color: #1e9e5a; }
+        .tf-feedback.wrong { color: #d13b3b; }
+
+        /* Short answer specific */
+        .sa-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 38px;
+            margin-top: 4px;
+        }
+        .sa-row input[type="text"] {
+            flex: 1;
+            max-width: 320px;
+            padding: 8px 12px;
+            border: 1.5px solid #cbd6e6;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .sa-row input[type="text"]:focus {
+            border-color: #2d6cdf;
+        }
+        .sa-row .correct-mark {
+            color: #1e9e5a;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: none;
+        }
+        .sa-row .wrong-mark {
+            color: #d13b3b;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: none;
+        }
+        .sa-row .correct-mark.visible,
+        .sa-row .wrong-mark.visible {
+            display: inline;
+        }
+
+        /* Bottom action bar */
+        .action-bar {
+            display: flex;
+            gap: 14px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 10px 0 4px;
+        }
+        .action-bar button {
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-check {
+            background: #2d6cdf;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(45, 108, 223, 0.3);
+        }
+        .btn-check:hover {
+            background: #1e5bc4;
+            transform: translateY(-1px);
+        }
+        .btn-reset {
+            background: #eef2f9;
+            color: #3a4b60;
+            border: 1px solid #cbd6e6;
+        }
+        .btn-reset:hover {
+            background: #dce5f2;
+        }
+        .total-score {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e2b3c;
+            padding: 6px 16px;
+            background: #e8f0fe;
+            border-radius: 40px;
+            display: none;
+        }
+        .total-score.visible {
+            display: inline-block;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            .video-column {
+                position: static;
+                flex: 1 1 auto;
+                width: 100%;
+                padding-right: 0;
+            }
+            .resizer {
+                display: none;
+            }
+            .exercise-column {
+                max-height: none;
+                overflow-y: visible;
+                padding-right: 0;
+                padding-left: 0;
+            }
+            body { padding: 12px; }
+            .exercise-card { padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="mainContainer">
+    <!-- LEFT: STICKY VIDEO + CUE CARD -->
+    <div class="video-column" id="videoColumn">
+        <div class="video-wrapper">
+            <iframe
+                src="https://www.youtube-nocookie.com/embed/QGW-pHR8aaU?rel=0"
+                title="YouTube video player"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+            <div class="video-fallback" style="display: none;" id="videoFallback">
+                <p>If the video doesn't load, click below to open it on YouTube.</p>
+                <a href="https://www.youtube.com/watch?v=QGW-pHR8aaU" target="_blank" rel="noopener">Open video on YouTube ↗</a>
+            </div>
+        </div>
+        <div style="text-align: center; font-size: 0.85rem;">
+            <a href="https://www.youtube.com/watch?v=QGW-pHR8aaU" target="_blank" rel="noopener" style="color: #2d6cdf; text-decoration: none; font-weight: 500;">
+                ↗ Open video directly on YouTube (if embed fails)
+            </a>
+        </div>
+        <div class="cue-card">
+            <h4>📌 Scroll cues — pause and move to next exercise</h4>
+            <ul>
+                <li><span class="badge">1</span> Before play: show <strong>Exercise 1</strong></li>
+                <li><span class="badge">2</span> Pause after: <em>"…what's called a zero day"</em> → scroll to <strong>Exercise 2</strong></li>
+                <li><span class="badge">3</span> Pause after: <em>"…connected to the internet."</em> → scroll to <strong>Exercise 3</strong></li>
+                <li><span class="badge">4</span> Pause after: <em>"…a model called GLM running on their own machines."</em> → scroll to <strong>Exercise 4</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- DRAG RESIZER -->
+    <div class="resizer" id="resizer" title="Drag to resize"></div>
+
+    <!-- RIGHT: SCROLLABLE EXERCISES -->
+    <div class="exercise-column" id="exerciseStack">
+        <!-- EXERCISE 1 -->
+        <div class="exercise-card active" id="ex1">
+            <div class="exercise-header">
+                <div class="exercise-title"><span>1</span> Multiple Choice</div>
+                <span class="score-badge" id="score1">0 / 5</span>
+            </div>
+            <ul class="question-list" id="qlist1">
+                <li data-q="1" data-answer="B">
+                    <div class="q-text"><span class="q-num">1.</span> What did OpenAI admit in their blog post?</div>
+                    <div class="option-buttons" data-q="1">
+                        <button data-val="A">A. Their AI had been stolen by another company.</button>
+                        <button data-val="B">B. Their AI had escaped a restricted environment and hacked another company's computers.</button>
+                        <button data-val="C">C. Their AI had refused to take a test.</button>
+                    </div>
+                    <div class="feedback-text" id="fb1-1"></div>
+                </li>
+                <li data-q="2" data-answer="B">
+                    <div class="q-text"><span class="q-num">2.</span> What is "Exploit Gym"?</div>
+                    <div class="option-buttons" data-q="2">
+                        <button data-val="A">A. A fitness programme for AI developers.</button>
+                        <button data-val="B">B. A standardized test to measure how well AI models can break into things.</button>
+                        <button data-val="C">C. A security software company.</button>
+                    </div>
+                    <div class="feedback-text" id="fb1-2"></div>
+                </li>
+                <li data-q="3" data-answer="A">
+                    <div class="q-text"><span class="q-num">3.</span> What are "safety refusals"?</div>
+                    <div class="option-buttons" data-q="3">
+                        <button data-val="A">A. Guardrails that normally make an AI decline to do harmful things.</button>
+                        <button data-val="B">B. Rules that stop employees from sharing passwords.</button>
+                        <button data-val="C">C. A type of computer virus.</button>
+                    </div>
+                    <div class="feedback-text" id="fb1-3"></div>
+                </li>
+                <li data-q="4" data-answer="B">
+                    <div class="q-text"><span class="q-num">4.</span> What is a "zero day"?</div>
+                    <div class="option-buttons" data-q="4">
+                        <button data-val="A">A. The first day of a hacking test.</button>
+                        <button data-val="B">B. A flaw in code that nobody knew about, including the company that wrote the software.</button>
+                        <button data-val="C">C. A day when all systems are offline.</button>
+                    </div>
+                    <div class="feedback-text" id="fb1-4"></div>
+                </li>
+                <li data-q="5" data-answer="B">
+                    <div class="q-text"><span class="q-num">5.</span> What does the speaker compare the AI's escape to?</div>
+                    <div class="option-buttons" data-q="5">
+                        <button data-val="A">A. A bank robbery in broad daylight.</button>
+                        <button data-val="B">B. The film <em>The Shawshank Redemption</em>.</button>
+                        <button data-val="C">C. A spy movie.</button>
+                    </div>
+                    <div class="feedback-text" id="fb1-5"></div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- EXERCISE 2 -->
+        <div class="exercise-card" id="ex2">
+            <div class="exercise-header">
+                <div class="exercise-title"><span>2</span> Note Completion</div>
+                <span class="score-badge" id="score2">0 / 5</span>
+            </div>
+            <div class="note-line">
+                <p style="margin-bottom: 14px; font-weight: 500; color: #1e2b3c;">Complete the notes. Write <strong>NO MORE THAN THREE WORDS AND/OR A NUMBER</strong> for each answer.</p>
+                <p>• The test was run with <span class="blank"><input type="text" data-q="6" data-answer="no internet connection" class="note-input"><span class="inline-mark" id="im2-6"></span></span> , with just the AI and the task.</p>
+                <p>• The model spent an enormous amount of <span class="blank"><input type="text" data-q="7" data-answer="computing power" class="note-input"><span class="inline-mark" id="im2-7"></span></span> looking for a way out.</p>
+                <p>• It used the flaw to <span class="blank"><input type="text" data-q="8" data-answer="worm its way out" class="note-input"><span class="inline-mark" id="im2-8"></span></span> of the sealed environment.</p>
+                <p>• It moved through OpenAI's internal computers and <span class="blank"><input type="text" data-q="9" data-answer="gave itself more permissions" class="note-input"><span class="inline-mark" id="im2-9"></span></span> as it went.</p>
+                <p>• Eventually it reached a machine that was <span class="blank"><input type="text" data-q="10" data-answer="connected to the internet" class="note-input"><span class="inline-mark" id="im2-10"></span></span> .</p>
+            </div>
+        </div>
+
+        <!-- EXERCISE 3 -->
+        <div class="exercise-card" id="ex3">
+            <div class="exercise-header">
+                <div class="exercise-title"><span>3</span> True / False / Not Given</div>
+                <span class="score-badge" id="score3">0 / 5</span>
+            </div>
+            <ul class="question-list" id="qlist3">
+                <li data-q="11" data-answer="T">
+                    <div class="q-text"><span class="q-num">11.</span> Hugging Face is described as a place where the AI industry stores its models and data.</div>
+                    <div class="tf-ng-row" data-q="11">
+                        <button data-val="T">True</button>
+                        <button data-val="F">False</button>
+                        <button data-val="NG">Not Given</button>
+                    </div>
+                    <div class="tf-feedback" id="tf3-11"></div>
+                </li>
+                <li data-q="12" data-answer="T">
+                    <div class="q-text"><span class="q-num">12.</span> The AI was looking for the answer sheet to the exam it was sitting.</div>
+                    <div class="tf-ng-row" data-q="12">
+                        <button data-val="T">True</button>
+                        <button data-val="F">False</button>
+                        <button data-val="NG">Not Given</button>
+                    </div>
+                    <div class="tf-feedback" id="tf3-12"></div>
+                </li>
+                <li data-q="13" data-answer="T">
+                    <div class="q-text"><span class="q-num">13.</span> Hugging Face discovered the attack before OpenAI contacted them.</div>
+                    <div class="tf-ng-row" data-q="13">
+                        <button data-val="T">True</button>
+                        <button data-val="F">False</button>
+                        <button data-val="NG">Not Given</button>
+                    </div>
+                    <div class="tf-feedback" id="tf3-13"></div>
+                </li>
+                <li data-q="14" data-answer="F">
+                    <div class="q-text"><span class="q-num">14.</span> American AI tools helped Hugging Face's team investigate the attack.</div>
+                    <div class="tf-ng-row" data-q="14">
+                        <button data-val="T">True</button>
+                        <button data-val="F">False</button>
+                        <button data-val="NG">Not Given</button>
+                    </div>
+                    <div class="tf-feedback" id="tf3-14"></div>
+                </li>
+                <li data-q="15" data-answer="T">
+                    <div class="q-text"><span class="q-num">15.</span> The AI passed the hacking test.</div>
+                    <div class="tf-ng-row" data-q="15">
+                        <button data-val="T">True</button>
+                        <button data-val="F">False</button>
+                        <button data-val="NG">Not Given</button>
+                    </div>
+                    <div class="tf-feedback" id="tf3-15"></div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- EXERCISE 4 -->
+        <div class="exercise-card" id="ex4">
+            <div class="exercise-header">
+                <div class="exercise-title"><span>4</span> Short Answer</div>
+                <span class="score-badge" id="score4">0 / 5</span>
+            </div>
+            <ul class="question-list" id="qlist4">
+                <li data-q="16" data-answer="a chinese one">
+                    <div class="q-text"><span class="q-num">16.</span> What kind of model did Hugging Face's team use instead to investigate the attack?</div>
+                    <div class="sa-row">
+                        <input type="text" class="sa-input" data-q="16" placeholder="Your answer">
+                        <span class="correct-mark">✓</span>
+                        <span class="wrong-mark">✗</span>
+                    </div>
+                    <div class="feedback-text" id="fb4-16"></div>
+                </li>
+                <li data-q="17" data-answer="hacking its own grading environments">
+                    <div class="q-text"><span class="q-num">17.</span> What had an outside lab caught the model doing before it was even launched?</div>
+                    <div class="sa-row">
+                        <input type="text" class="sa-input" data-q="17" placeholder="Your answer">
+                        <span class="correct-mark">✓</span>
+                        <span class="wrong-mark">✗</span>
+                    </div>
+                    <div class="feedback-text" id="fb4-17"></div>
+                </li>
+                <li data-q="18" data-answer="to be on the internet">
+                    <div class="q-text"><span class="q-num">18.</span> What does the speaker say the models "just want"?</div>
+                    <div class="sa-row">
+                        <input type="text" class="sa-input" data-q="18" placeholder="Your answer">
+                        <span class="correct-mark">✓</span>
+                        <span class="wrong-mark">✗</span>
+                    </div>
+                    <div class="feedback-text" id="fb4-18"></div>
+                </li>
+                <li data-q="19" data-answer="go get a high score">
+                    <div class="q-text"><span class="q-num">19.</span> According to the speaker, what did somebody tell the model to do?</div>
+                    <div class="sa-row">
+                        <input type="text" class="sa-input" data-q="19" placeholder="Your answer">
+                        <span class="correct-mark">✓</span>
+                        <span class="wrong-mark">✗</span>
+                    </div>
+                    <div class="feedback-text" id="fb4-19"></div>
+                </li>
+                <li data-q="20" data-answer="this">
+                    <div class="q-text"><span class="q-num">20.</span> What does OpenAI expect to become more common as models get more cyber-capable?</div>
+                    <div class="sa-row">
+                        <input type="text" class="sa-input" data-q="20" placeholder="Your answer">
+                        <span class="correct-mark">✓</span>
+                        <span class="wrong-mark">✗</span>
+                    </div>
+                    <div class="feedback-text" id="fb4-20"></div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ACTION BAR -->
+        <div class="action-bar">
+            <button class="btn-check" id="checkAllBtn">Check All Answers</button>
+            <button class="btn-reset" id="resetAllBtn">Reset</button>
+            <span class="total-score" id="totalScore">Total: 0 / 20</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- DATA ----------
+    const acceptAnswers = {
+        6: ["no internet connection", "no internet", "without internet"],
+        7: ["computing power"],
+        8: ["worm its way out", "worm out", "escape", "break out"],
+        9: ["gave itself more permissions", "granted itself permissions"],
+        10: ["connected to the internet"],
+        16: ["a chinese one", "a chinese model", "glm", "a model called glm", "chinese one"],
+        17: ["hacking its own grading environments", "inflating its scores", "pulling hidden answers", "hacking its own grading environment"],
+        18: ["to be on the internet", "be on the internet"],
+        19: ["go get a high score", "get a high score"],
+        20: ["this", "this situation", "models escaping", "more chaos", "these kinds of incidents"]
+    };
+
+    function normalise(str) {
+        return str.toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    // ---------- SELECTABLE BUTTONS (MC and T/F/NG) ----------
+    document.querySelectorAll('.option-buttons').forEach(group => {
+        group.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                group.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+    });
+
+    document.querySelectorAll('.tf-ng-row').forEach(row => {
+        row.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                row.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+    });
+
+    // ---------- CHECK ALL ----------
+    document.getElementById('checkAllBtn').addEventListener('click', function() {
+        let totalCorrect = 0;
+
+        // ----- EXERCISE 1: Multiple Choice (buttons) -----
+        let correct1 = 0;
+        document.querySelectorAll('#qlist1 li').forEach(li => {
+            const q = li.dataset.q;
+            const correctAns = li.dataset.answer;
+            const group = li.querySelector('.option-buttons');
+            const selected = group.querySelector('button.selected');
+            const fb = document.getElementById('fb1-' + q);
+
+            group.querySelectorAll('button').forEach(b => b.classList.remove('correct', 'wrong'));
+
+            if (selected) {
+                if (selected.dataset.val === correctAns) {
+                    selected.classList.add('correct');
+                    fb.textContent = 'Correct!';
+                    fb.classList.add('visible');
+                    fb.classList.remove('wrong-feedback');
+                    correct1++;
+                    totalCorrect++;
+                } else {
+                    selected.classList.add('wrong');
+                    group.querySelectorAll('button').forEach(b => {
+                        if (b.dataset.val === correctAns) b.classList.add('correct');
+                    });
+                    fb.textContent = 'Wrong — correct answer: ' + correctAns;
+                    fb.classList.add('visible');
+                    fb.classList.add('wrong-feedback');
+                }
+            } else {
+                fb.textContent = 'No answer selected.';
+                fb.classList.add('visible');
+                fb.classList.add('wrong-feedback');
+            }
+        });
+        const score1 = document.getElementById('score1');
+        score1.textContent = correct1 + ' / 5';
+        score1.classList.add('visible');
+
+        // ----- EXERCISE 2: Note Completion -----
+        let correct2 = 0;
+        document.querySelectorAll('.note-input').forEach(input => {
+            const q = input.dataset.q;
+            const expectedList = acceptAnswers[q] || [];
+            const mark = document.getElementById('im2-' + q);
+            const val = normalise(input.value);
+
+            if (expectedList.some(e => normalise(e) === val)) {
+                mark.textContent = '✓';
+                mark.classList.add('visible', 'correct');
+                mark.classList.remove('wrong');
+                input.style.borderColor = '#1e9e5a';
+                correct2++;
+                totalCorrect++;
+            } else if (val === '') {
+                mark.textContent = '✗';
+                mark.classList.add('visible', 'wrong');
+                mark.classList.remove('correct');
+                input.style.borderColor = '#d13b3b';
+            } else {
+                mark.textContent = '✗';
+                mark.classList.add('visible', 'wrong');
+                mark.classList.remove('correct');
+                input.style.borderColor = '#d13b3b';
+            }
+        });
+        const score2 = document.getElementById('score2');
+        score2.textContent = correct2 + ' / 5';
+        score2.classList.add('visible');
+
+        // ----- EXERCISE 3: T/F/NG -----
+        let correct3 = 0;
+        document.querySelectorAll('#qlist3 li').forEach(li => {
+            const q = li.dataset.q;
+            const correctAns = li.dataset.answer;
+            const row = li.querySelector('.tf-ng-row');
+            const selected = row.querySelector('button.selected');
+            const fb = document.getElementById('tf3-' + q);
+
+            row.querySelectorAll('button').forEach(b => b.classList.remove('correct', 'wrong'));
+
+            if (selected) {
+                if (selected.dataset.val === correctAns) {
+                    selected.classList.add('correct');
+                    fb.textContent = 'Correct!';
+                    fb.classList.add('visible');
+                    fb.classList.remove('wrong');
+                    correct3++;
+                    totalCorrect++;
+                } else {
+                    selected.classList.add('wrong');
+                    row.querySelectorAll('button').forEach(b => {
+                        if (b.dataset.val === correctAns) b.classList.add('correct');
+                    });
+                    fb.textContent = 'Wrong — correct answer: ' + correctAns;
+                    fb.classList.add('visible');
+                    fb.classList.add('wrong');
+                }
+            } else {
+                fb.textContent = 'No answer selected.';
+                fb.classList.add('visible');
+                fb.classList.add('wrong');
+            }
+        });
+        const score3 = document.getElementById('score3');
+        score3.textContent = correct3 + ' / 5';
+        score3.classList.add('visible');
+
+        // ----- EXERCISE 4: Short Answer -----
+        let correct4 = 0;
+        document.querySelectorAll('.sa-input').forEach(input => {
+            const q = input.dataset.q;
+            const expectedList = acceptAnswers[q] || [];
+            const li = input.closest('li');
+            const correctMark = li.querySelector('.correct-mark');
+            const wrongMark = li.querySelector('.wrong-mark');
+            const fb = document.getElementById('fb4-' + q);
+            const val = normalise(input.value);
+
+            if (expectedList.some(e => normalise(e) === val)) {
+                correctMark.classList.add('visible');
+                wrongMark.classList.remove('visible');
+                fb.textContent = 'Correct!';
+                fb.classList.add('visible');
+                fb.classList.remove('wrong-feedback');
+                input.style.borderColor = '#1e9e5a';
+                correct4++;
+                totalCorrect++;
+            } else if (val === '') {
+                correctMark.classList.remove('visible');
+                wrongMark.classList.remove('visible');
+                fb.textContent = 'No answer given.';
+                fb.classList.add('visible');
+                fb.classList.add('wrong-feedback');
+                input.style.borderColor = '#d13b3b';
+            } else {
+                correctMark.classList.remove('visible');
+                wrongMark.classList.add('visible');
+                fb.textContent = 'Wrong — correct answer: ' + expectedList[0];
+                fb.classList.add('visible');
+                fb.classList.add('wrong-feedback');
+                input.style.borderColor = '#d13b3b';
+            }
+        });
+        const score4 = document.getElementById('score4');
+        score4.textContent = correct4 + ' / 5';
+        score4.classList.add('visible');
+
+        // ----- TOTAL -----
+        const totalEl = document.getElementById('totalScore');
+        totalEl.textContent = 'Total: ' + totalCorrect + ' / 20';
+        totalEl.classList.add('visible');
+    });
+
+    // ---------- RESET ----------
+    document.getElementById('resetAllBtn').addEventListener('click', function() {
+        document.querySelectorAll('input[type="text"]').forEach(inp => {
+            inp.value = '';
+            inp.style.borderColor = '#cbd6e6';
+        });
+        document.querySelectorAll('.option-buttons button, .tf-ng-row button').forEach(b => {
+            b.classList.remove('selected', 'correct', 'wrong');
+        });
+        document.querySelectorAll('.correct-mark, .wrong-mark, .inline-mark, .feedback-text, .tf-feedback').forEach(el => {
+            el.classList.remove('visible', 'correct', 'wrong', 'wrong-feedback');
+        });
+        document.querySelectorAll('.score-badge, .total-score').forEach(el => {
+            el.classList.remove('visible');
+        });
+        document.querySelectorAll('.score-badge').forEach(el => {
+            el.textContent = '0 / 5';
+        });
+        document.getElementById('totalScore').textContent = 'Total: 0 / 20';
+    });
+
+    // ---------- SCROLL HIGHLIGHT ----------
+    const cards = document.querySelectorAll('.exercise-card');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                cards.forEach(c => c.classList.remove('active'));
+                entry.target.classList.add('active');
+            }
+        });
+    }, { threshold: 0.4 });
+
+    cards.forEach(card => observer.observe(card));
+
+    // ---------- DRAG RESIZER ----------
+    (function() {
+        const container = document.getElementById('mainContainer');
+        const videoCol = document.getElementById('videoColumn');
+        const resizer = document.getElementById('resizer');
+
+        let isDragging = false;
+        let startX = 0;
+        let startVideoWidth = 0;
+        let startExerciseWidth = 0;
+        let exerciseCol = document.getElementById('exerciseStack');
+
+        resizer.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.clientX;
+            startVideoWidth = videoCol.getBoundingClientRect().width;
+            startExerciseWidth = exerciseCol.getBoundingClientRect().width;
+            resizer.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            const deltaX = e.clientX - startX;
+            const newVideoWidth = startVideoWidth + deltaX;
+            const newExerciseWidth = startExerciseWidth - deltaX;
+
+            const minWidth = 280;
+            const maxWidth = container.getBoundingClientRect().width - minWidth - 10; // minus resizer
+
+            if (newVideoWidth >= minWidth && newVideoWidth <= maxWidth && newExerciseWidth >= minWidth) {
+                videoCol.style.flex = '0 0 ' + newVideoWidth + 'px';
+                videoCol.style.width = newVideoWidth + 'px';
+                exerciseCol.style.flex = '1 1 ' + newExerciseWidth + 'px';
+            }
+        });
+
+        window.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                resizer.classList.remove('dragging');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        });
+
+        // Touch support
+        resizer.addEventListener('touchstart', function(e) {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            startVideoWidth = videoCol.getBoundingClientRect().width;
+            startExerciseWidth = exerciseCol.getBoundingClientRect().width;
+            resizer.classList.add('dragging');
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        }, { passive: false });
+
+        window.addEventListener('touchmove', function(e) {
+            if (!isDragging) return;
+            const deltaX = e.touches[0].clientX - startX;
+            const newVideoWidth = startVideoWidth + deltaX;
+            const newExerciseWidth = startExerciseWidth - deltaX;
+
+            const minWidth = 280;
+            const maxWidth = container.getBoundingClientRect().width - minWidth - 10;
+
+            if (newVideoWidth >= minWidth && newVideoWidth <= maxWidth && newExerciseWidth >= minWidth) {
+                videoCol.style.flex = '0 0 ' + newVideoWidth + 'px';
+                videoCol.style.width = newVideoWidth + 'px';
+                exerciseCol.style.flex = '1 1 ' + newExerciseWidth + 'px';
+            }
+            e.preventDefault();
+        }, { passive: false });
+
+        window.addEventListener('touchend', function() {
+            if (isDragging) {
+                isDragging = false;
+                resizer.classList.remove('dragging');
+                document.body.style.userSelect = '';
+            }
+        });
+    })();
+</script>
+
+</body>
+</html>
