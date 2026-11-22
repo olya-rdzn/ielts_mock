@@ -2,14 +2,16 @@
   "tests": [
     {
       "id": "ai-escape",
-      "title": "Practice 1: AI Escape",
-      "level": "IELTS / Upper-Intermediate",
+      "type": "listening",
+      "title": "AI Escape",
+      "level": "Upper-Intermediate",
       "file": "ai-escape.json"
     },
     {
       "id": "food-affects-brain",
-      "title": "Practice 2: How the Food You Eat Affects Your Brain",
-      "level": "IELTS / Upper-Intermediate",
+      "type": "listening",
+      "title": "How the Food You Eat Affects Your Brain",
+      "level": "Upper-Intermediate",
       "file": "food-affects-brain.json"
     }
   ]
