@@ -1,0 +1,244 @@
+{
+  "id": "food-affects-brain",
+  "title": "How the Food You Eat Affects Your Brain",
+  "youtubeId": "xyQY8a-ng6g",
+  "cues": [
+    {
+      "badge": "1",
+      "html": "Before play: show <strong>Exercise 1</strong>"
+    },
+    {
+      "badge": "2",
+      "html": "Pause after: <em>\"…compromise brain health.\"</em> → scroll to <strong>Exercise 2</strong>"
+    },
+    {
+      "badge": "3",
+      "html": "Pause after: <em>\"…early cognitive development.\"</em> → scroll to <strong>Exercise 3</strong>"
+    },
+    {
+      "badge": "4",
+      "html": "Pause after: <em>\"…sustained brain power.\"</em> → scroll to <strong>Exercise 4</strong>"
+    }
+  ],
+  "exercises": [
+    {
+      "id": "ex1",
+      "type": "multiple_choice",
+      "title": "Multiple Choice",
+      "questions": [
+        {
+          "id": 1,
+          "prompt": "If all moisture were removed from the brain, where would most of its weight come from?",
+          "options": [
+            {
+              "value": "A",
+              "label": "A. Proteins and amino acids."
+            },
+            {
+              "value": "B",
+              "label": "B. Fats, also known as lipids."
+            },
+            {
+              "value": "C",
+              "label": "C. Glucose and micronutrients."
+            }
+          ],
+          "answer": "B"
+        },
+        {
+          "id": 2,
+          "prompt": "Which fats are described as the superstars of the fats in your brain?",
+          "options": [
+            {
+              "value": "A",
+              "label": "A. Trans and saturated fats."
+            },
+            {
+              "value": "B",
+              "label": "B. Omegas 3 and 6."
+            },
+            {
+              "value": "C",
+              "label": "C. Monounsaturated fats from white bread."
+            }
+          ],
+          "answer": "B"
+        },
+        {
+          "id": 3,
+          "prompt": "Where must omega-3 and omega-6 fatty acids come from?",
+          "options": [
+            {
+              "value": "A",
+              "label": "A. Our diets."
+            },
+            {
+              "value": "B",
+              "label": "B. Stored glucose reserves."
+            },
+            {
+              "value": "C",
+              "label": "C. Antioxidants in white bread."
+            }
+          ],
+          "answer": "A"
+        },
+        {
+          "id": 4,
+          "prompt": "Why is eating a variety of foods important for neurotransmitters?",
+          "options": [
+            {
+              "value": "A",
+              "label": "A. It eliminates the need for glucose in the brain."
+            },
+            {
+              "value": "B",
+              "label": "B. Amino acids compete for limited access, so variety helps keep mood balanced."
+            },
+            {
+              "value": "C",
+              "label": "C. It turns fiber into saturated fat."
+            }
+          ],
+          "answer": "B"
+        },
+        {
+          "id": 5,
+          "prompt": "What are neurotransmitters?",
+          "options": [
+            {
+              "value": "A",
+              "label": "A. Sugars stored in the frontal lobes."
+            },
+            {
+              "value": "B",
+              "label": "B. Chemical messengers that carry signals between neurons."
+            },
+            {
+              "value": "C",
+              "label": "C. Free radicals that destroy brain cells."
+            }
+          ],
+          "answer": "B"
+        }
+      ]
+    },
+    {
+      "id": "ex2",
+      "type": "note_completion",
+      "title": "Note Completion",
+      "instructionsHtml": "Complete the notes. Write <strong>NO MORE THAN THREE WORDS AND/OR A NUMBER</strong> for each answer.",
+      "lines": [
+        "Omega foods like nuts, seeds, and {{q:6}} help create and maintain cell membranes.",
+        "Long-term intake of trans and {{q:7}} may compromise brain health.",
+        "Proteins and amino acids are the building blocks that contain precursors to {{q:8}} .",
+        "Food compounds can stimulate brain cells to release {{q:9}} , dopamine, and serotonin.",
+        "Neurotransmitters influence mood, sleep, {{q:10}} , and weight."
+      ],
+      "answers": {
+        "6": [
+          "fatty fish",
+          "fish"
+        ],
+        "7": [
+          "saturated fats",
+          "saturated fat"
+        ],
+        "8": [
+          "neurotransmitters"
+        ],
+        "9": [
+          "norepinephrine"
+        ],
+        "10": [
+          "attentiveness"
+        ]
+      }
+    },
+    {
+      "id": "ex3",
+      "type": "tf_ng",
+      "title": "True / False / Not Given",
+      "questions": [
+        {
+          "id": 11,
+          "prompt": "Antioxidants in fruits and vegetables help the brain fight off free radicals that destroy brain cells.",
+          "answer": "T"
+        },
+        {
+          "id": 12,
+          "prompt": "Vitamins B6, B12, and folic acid help protect the brain from disease and mental decline.",
+          "answer": "T"
+        },
+        {
+          "id": 13,
+          "prompt": "Taking daily vitamin supplements is more effective than eating whole foods.",
+          "answer": "NG"
+        },
+        {
+          "id": 14,
+          "prompt": "The human brain makes up about 20% of our body weight.",
+          "answer": "F"
+        },
+        {
+          "id": 15,
+          "prompt": "The frontal lobes are sensitive to drops in glucose.",
+          "answer": "T"
+        }
+      ]
+    },
+    {
+      "id": "ex4",
+      "type": "short_answer",
+      "title": "Short Answer",
+      "questions": [
+        {
+          "id": 16,
+          "prompt": "What percentage of the body's energy resources can the brain use?",
+          "answers": [
+            "up to 20%",
+            "20%",
+            "up to 20 percent",
+            "20 percent"
+          ]
+        },
+        {
+          "id": 17,
+          "prompt": "What do carbohydrates get digested into to provide most of the brain's energy?",
+          "answers": [
+            "glucose",
+            "blood sugar"
+          ]
+        },
+        {
+          "id": 18,
+          "prompt": "Name one of the three forms of carbohydrates mentioned in the video.",
+          "answers": [
+            "starch",
+            "sugar",
+            "fiber",
+            "fibre"
+          ]
+        },
+        {
+          "id": 19,
+          "prompt": "What example of a high glycemic food causes a rapid release of glucose followed by a dip?",
+          "answers": [
+            "white bread",
+            "bread"
+          ]
+        },
+        {
+          "id": 20,
+          "prompt": "Which slower-releasing foods provide a steadier level of attentiveness?",
+          "answers": [
+            "oats, grains, and legumes",
+            "oats grains and legumes",
+            "oats, grains and legumes",
+            "oats"
+          ]
+        }
+      ]
+    }
+  ]
+}
