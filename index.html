@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Listening Practice</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #f4f7fc;
+            color: #1a2639;
+            padding: 20px 24px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* ---------- TOP TEST SELECTOR BAR ---------- */
+        .top-bar {
+            max-width: 1400px;
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #dfe7f0;
+            border-radius: 16px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand-badge {
+            background: #2d6cdf;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 8px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+        .brand h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e2b3c;
+        }
+        .test-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .test-picker label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #3a4b60;
+        }
+        .test-picker select {
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1.5px solid #cbd6e6;
+            background: #f9fbff;
+            color: #1e2b3c;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            min-width: 240px;
+            transition: border-color 0.2s;
+        }
+        .test-picker select:focus,
+        .test-picker select:hover {
+            border-color: #2d6cdf;
+        }
+        .status-banner {
+            max-width: 1400px;
+            width: 100%;
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 0.92rem;
+            display: none;
+        }
+        .status-banner.error {
+            display: block;
+            background: #fdecec;
+            color: #a61b1b;
+            border: 1px solid #f5c2c2;
+        }
+        .status-banner.info {
+            display: block;
+            background: #e8f0fe;
+            color: #1e429f;
+            border: 1px solid #c3d7fd;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            display: flex;
+            gap: 0;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        /* ---------- LEFT: STICKY VIDEO COLUMN ---------- */
+        .video-column {
+            flex: 0 0 560px;
+            min-width: 280px;
+            position: sticky;
+            top: 24px;
+            align-self: flex-start;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding-right: 14px;
+        }
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background: #000;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .cue-card {
+            background: #1e2b3c;
+            color: #eef4ff;
+            padding: 16px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .cue-card h4 {
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            margin-bottom: 8px;
+            color: #9fc9ff;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .cue-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .cue-card li {
+            display: flex;
+            gap: 10px;
+        }
+        .cue-card .badge {
+            background: #3b5b8c;
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            color: #fff;
+            align-self: center;
+        }
+
+        /* ---------- DRAG RESIZER ---------- */
+        .resizer {
+            flex: 0 0 10px;
+            width: 10px;
+            cursor: col-resize;
+            background: transparent;
+            position: relative;
+            align-self: stretch;
+            min-height: 200px;
+            touch-action: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .resizer::after {
+            content: '';
+            width: 4px;
+            height: 60px;
+            background: #cbd6e6;
+            border-radius: 4px;
+            transition: background 0.2s, height 0.2s;
+        }
+        .resizer:hover::after,
+        .resizer.dragging::after {
+            background: #2d6cdf;
+            height: 100px;
+        }
+
+        /* ---------- RIGHT: SCROLLABLE EXERCISES ---------- */
+        .exercise-column {
+            flex: 1 1 500px;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            max-height: calc(100vh - 110px);
+            overflow-y: auto;
+            padding-right: 8px;
+            padding-left: 14px;
+            scroll-behavior: smooth;
+        }
+        .exercise-column::-webkit-scrollbar {
+            width: 8px;
+        }
+        .exercise-column::-webkit-scrollbar-track {
+            background: #e9eef5;
+            border-radius: 10px;
+        }
+        .exercise-column::-webkit-scrollbar-thumb {
+            background: #b7c7db;
+            border-radius: 10px;
+        }
+        .exercise-column::-webkit-scrollbar-thumb:hover {
+            background: #8fa6c2;
+        }
+
+        .exercise-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 24px 24px 18px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid #dfe7f0;
+            transition: border-color 0.2s;
+            flex-shrink: 0;
+        }
+        .exercise-card.active {
+            border-color: #2d6cdf;
+            box-shadow: 0 8px 24px rgba(45, 108, 223, 0.15);
+        }
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .exercise-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e2b3c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .exercise-title span {
+            background: #1e2b3c;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 40px;
+            padding: 3px 12px;
+        }
+        .score-badge {
+            background: #e8f0fe;
+            color: #2d6cdf;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 4px 14px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            display: none;
+        }
+        .score-badge.visible {
+            display: inline-block;
+        }
+
+        /* ---------- INTERACTIVE SELECTABLE BUTTONS ---------- */
+        .question-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .question-list li {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            padding: 4px 0;
+        }
+        .q-text {
+            display: flex;
+            gap: 12px;
+            font-weight: 500;
+        }
+        .q-num {
+            font-weight: 700;
+            color: #2d6cdf;
+            min-width: 26px;
+        }
+        .option-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-left: 38px;
+        }
+        .option-buttons button {
+            padding: 8px 20px;
+            border-radius: 40px;
+            border: 1.5px solid #cbd6e6;
+            background: #fff;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: #3a4b60;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+            text-align: left;
+            line-height: 1.3;
+            max-width: 100%;
+        }
+        .option-buttons button:hover {
+            border-color: #2d6cdf;
+            color: #2d6cdf;
+        }
+        .option-buttons button.selected {
+            background: #2d6cdf;
+            border-color: #2d6cdf;
+            color: #fff;
+        }
+        .option-buttons button.correct {
+            background: #1e9e5a;
+            border-color: #1e9e5a;
+            color: #fff;
+        }
+        .option-buttons button.wrong {
+            background: #d13b3b;
+            border-color: #d13b3b;
+            color: #fff;
+        }
+        .feedback-text {
+            margin-left: 38px;
+            font-size: 0.85rem;
+            color: #1e9e5a;
+            display: none;
+            font-weight: 500;
+        }
+        .feedback-text.visible {
+            display: block;
+        }
+        .feedback-text.wrong-feedback {
+            color: #d13b3b;
+        }
+
+        /* Note completion specific */
+        .note-line {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #2c3e50;
+        }
+        .note-line p {
+            margin-bottom: 10px;
+        }
+        .note-line .blank {
+            display: inline-block;
+            min-width: 120px;
+            margin: 0 4px;
+            padding: 0 2px;
+        }
+        .note-line .blank input {
+            width: 150px;
+            padding: 6px 8px;
+            border: 1.5px solid #cbd6e6;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .note-line .blank input:focus {
+            border-color: #2d6cdf;
+        }
+        .note-line .blank .inline-mark {
+            font-weight: 700;
+            margin-left: 4px;
+            display: none;
+        }
+        .note-line .blank .inline-mark.visible {
+            display: inline;
+        }
+        .note-line .blank .inline-mark.correct { color: #1e9e5a; }
+        .note-line .blank .inline-mark.wrong { color: #d13b3b; }
+
+        /* T/F/NG specific */
+        .tf-ng-row {
+            display: flex;
+            gap: 8px;
+            margin-left: 38px;
+            margin-top: 2px;
+            flex-wrap: wrap;
+        }
+        .tf-ng-row button {
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 1.5px solid #cbd6e6;
+            background: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #3a4b60;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .tf-ng-row button:hover {
+            border-color: #2d6cdf;
+            color: #2d6cdf;
+        }
+        .tf-ng-row button.selected {
+            background: #2d6cdf;
+            border-color: #2d6cdf;
+            color: #fff;
+        }
+        .tf-ng-row button.correct {
+            background: #1e9e5a;
+            border-color: #1e9e5a;
+            color: #fff;
+        }
+        .tf-ng-row button.wrong {
+            background: #d13b3b;
+            border-color: #d13b3b;
+            color: #fff;
+        }
+        .tf-feedback {
+            margin-left: 38px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 2px;
+            display: none;
+        }
+        .tf-feedback.visible {
+            display: block;
+        }
+        .tf-feedback.correct { color: #1e9e5a; }
+        .tf-feedback.wrong { color: #d13b3b; }
+
+        /* Short answer specific */
+        .sa-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 38px;
+            margin-top: 4px;
+        }
+        .sa-row input[type="text"] {
+            flex: 1;
+            max-width: 320px;
+            padding: 8px 12px;
+            border: 1.5px solid #cbd6e6;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .sa-row input[type="text"]:focus {
+            border-color: #2d6cdf;
+        }
+        .sa-row .correct-mark {
+            color: #1e9e5a;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: none;
+        }
+        .sa-row .wrong-mark {
+            color: #d13b3b;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: none;
+        }
+        .sa-row .correct-mark.visible,
+        .sa-row .wrong-mark.visible {
+            display: inline;
+        }
+
+        /* Bottom action bar */
+        .action-bar {
+            display: flex;
+            gap: 14px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 10px 0 4px;
+        }
+        .action-bar button {
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-check {
+            background: #2d6cdf;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(45, 108, 223, 0.3);
+        }
+        .btn-check:hover {
+            background: #1e5bc4;
+            transform: translateY(-1px);
+        }
+        .btn-reset {
+            background: #eef2f9;
+            color: #3a4b60;
+            border: 1px solid #cbd6e6;
+        }
+        .btn-reset:hover {
+            background: #dce5f2;
+        }
+        .total-score {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e2b3c;
+            padding: 6px 16px;
+            background: #e8f0fe;
+            border-radius: 40px;
+            display: none;
+        }
+        .total-score.visible {
+            display: inline-block;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            .video-column {
+                position: static;
+                flex: 1 1 auto;
+                width: 100%;
+                padding-right: 0;
+            }
+            .resizer {
+                display: none;
+            }
+            .exercise-column {
+                max-height: none;
+                overflow-y: visible;
+                padding-right: 0;
+                padding-left: 0;
+            }
+            body { padding: 12px; }
+            .exercise-card { padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="top-bar">
+    <div class="brand">
+        <span class="brand-badge">Listening Lab</span>
+        <h1 id="pageTitle">Classroom Listening Practice</h1>
+    </div>
+    <div class="test-picker">
+        <label for="mockSelect">Choose practice:</label>
+        <select id="mockSelect" aria-label="Choose practice test">
+            <option value="">Loading tests...</option>
+        </select>
+    </div>
+</header>
+
+<div class="status-banner" id="statusBanner"></div>
+
+<div class="container" id="mainContainer">
+    <!-- LEFT: STICKY VIDEO + CUE CARD -->
+    <div class="video-column" id="videoColumn">
+        <div class="video-wrapper">
+            <iframe
+                id="videoFrame"
+                src=""
+                title="YouTube video player"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div style="text-align: center; font-size: 0.85rem;">
+            <a id="youtubeDirectLink" href="https://www.youtube.com" target="_blank" rel="noopener" style="color: #2d6cdf; text-decoration: none; font-weight: 500;">
+                ↗ Open video directly on YouTube (if embed fails)
+            </a>
+        </div>
+        <div class="cue-card" id="cueCard">
+            <h4>📌 Scroll cues — pause and move to next exercise</h4>
+            <ul id="cueList"></ul>
+        </div>
+    </div>
+
+    <!-- DRAG RESIZER -->
+    <div class="resizer" id="resizer" title="Drag to resize"></div>
+
+    <!-- RIGHT: SCROLLABLE EXERCISES -->
+    <div class="exercise-column" id="exerciseStack">
+        <div id="exercisesContainer"></div>
+
+        <!-- ACTION BAR -->
+        <div class="action-bar" id="actionBar" style="display: none;">
+            <button class="btn-check" id="checkAllBtn">Check All Answers</button>
+            <button class="btn-reset" id="resetAllBtn">Reset</button>
+            <span class="total-score" id="totalScore">Total: 0 / 0</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentMockData = null;
+    let intersectionObserver = null;
+
+    function normalise(str) {
+        return String(str || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function escapeHtml(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function showStatus(msg, type = 'info') {
+        const banner = document.getElementById('statusBanner');
+        if (!msg) {
+            banner.className = 'status-banner';
+            banner.textContent = '';
+            return;
+        }
+        banner.textContent = msg;
+        banner.className = 'status-banner ' + type;
+    }
+
+    // ---------- LOAD MANIFEST (mocks/index.json) ----------
+    async function initApp() {
+        const select = document.getElementById('mockSelect');
+        try {
+            const res = await fetch('./mocks/index.json', { cache: 'no-store' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const manifest = await res.json();
+            const tests = manifest.tests || [];
+
+            if (tests.length === 0) {
+                select.innerHTML = '<option value="">No tests found in mocks/index.json</option>';
+                showStatus('No practice tests are listed in mocks/index.json yet.', 'error');
+                return;
+            }
+
+            select.innerHTML = tests.map(t =>
+                `<option value="${escapeHtml(t.file)}">${escapeHtml(t.title)}${t.level ? ' (' + escapeHtml(t.level) + ')' : ''}</option>`
+            ).join('');
+
+            // Check URL ?test=filename.json parameter
+            const params = new URLSearchParams(window.location.search);
+            const requestedFile = params.get('test');
+            const initialTest = tests.find(t => t.file === requestedFile) ? requestedFile : tests[0].file;
+
+            select.value = initialTest;
+            select.addEventListener('change', () => {
+                const chosen = select.value;
+                const url = new URL(window.location);
+                url.searchParams.set('test', chosen);
+                window.history.replaceState({}, '', url);
+                loadMock(chosen);
+            });
+
+            await loadMock(initialTest);
+        } catch (err) {
+            select.innerHTML = '<option value="">Unable to load mocks/index.json</option>';
+            showStatus(
+                'Could not load ./mocks/index.json. If you are opening this file directly from your computer (file://), host it on GitHub Pages or run a local server (e.g. python3 -m http.server).',
+                'error'
+            );
+        }
+    }
+
+    // ---------- LOAD SINGLE MOCK JSON ----------
+    async function loadMock(filename) {
+        showStatus('');
+        try {
+            const res = await fetch('./mocks/' + encodeURIComponent(filename), { cache: 'no-store' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            currentMockData = data;
+            renderMock(data);
+        } catch (err) {
+            showStatus(`Failed to load ./mocks/${filename}: ${err.message}`, 'error');
+        }
+    }
+
+    // ---------- RENDER MOCK TEST ----------
+    function renderMock(data) {
+        document.title = `Classroom Listening Practice · ${data.title || 'Practice'}`;
+        document.getElementById('pageTitle').textContent = `Classroom Listening Practice · ${data.title || ''}`;
+
+        // Video & Direct link
+        const videoId = data.youtubeId || '';
+        document.getElementById('videoFrame').src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?rel=0`;
+        document.getElementById('youtubeDirectLink').href = `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`;
+
+        // Cue card
+        const cueCard = document.getElementById('cueCard');
+        const cueList = document.getElementById('cueList');
+        if (Array.isArray(data.cues) && data.cues.length > 0) {
+            cueCard.style.display = 'block';
+            cueList.innerHTML = data.cues.map((cue, idx) =>
+                `<li><span class="badge">${escapeHtml(cue.badge || (idx + 1))}</span><span>${cue.html || escapeHtml(cue.text || '')}</span></li>`
+            ).join('');
+        } else {
+            cueCard.style.display = 'none';
+        }
+
+        // Exercises
+        const container = document.getElementById('exercisesContainer');
+        container.innerHTML = '';
+
+        (data.exercises || []).forEach((ex, idx) => {
+            const card = document.createElement('div');
+            card.className = 'exercise-card' + (idx === 0 ? ' active' : '');
+            card.id = 'ex-' + (ex.id || (idx + 1));
+
+            const qCount = countQuestions(ex);
+            let bodyHtml = '';
+
+            if (ex.type === 'multiple_choice') {
+                bodyHtml = `<ul class="question-list">` + ex.questions.map(q => `
+                    <li data-qid="${escapeHtml(q.id)}">
+                        <div class="q-text"><span class="q-num">${escapeHtml(q.id)}.</span> ${q.promptHtml || escapeHtml(q.prompt)}</div>
+                        <div class="option-buttons">
+                            ${q.options.map(opt => `<button type="button" data-val="${escapeHtml(opt.value)}">${opt.labelHtml || escapeHtml(opt.label)}</button>`).join('')}
+                        </div>
+                        <div class="feedback-text" id="fb-${escapeHtml(q.id)}"></div>
+                    </li>
+                `).join('') + `</ul>`;
+            } else if (ex.type === 'note_completion') {
+                const instructionHtml = ex.instructionsHtml
+                    ? `<p style="margin-bottom: 14px; font-weight: 500; color: #1e2b3c;">${ex.instructionsHtml}</p>`
+                    : '';
+                const linesHtml = ex.lines.map(line => {
+                    // Replace {{q:6}} placeholders with inline input + checkmark span
+                    const renderedLine = line.replace(/\{\{q:([^}]+)\}\}/g, (_, qId) => {
+                        return `<span class="blank"><input type="text" data-qid="${escapeHtml(qId)}" class="note-input" aria-label="Question ${escapeHtml(qId)}"><span class="inline-mark" id="im-${escapeHtml(qId)}"></span></span>`;
+                    });
+                    return `<p>• ${renderedLine}</p>`;
+                }).join('');
+                bodyHtml = `<div class="note-line">${instructionHtml}${linesHtml}</div>`;
+            } else if (ex.type === 'tf_ng') {
+                bodyHtml = `<ul class="question-list">` + ex.questions.map(q => `
+                    <li data-qid="${escapeHtml(q.id)}">
+                        <div class="q-text"><span class="q-num">${escapeHtml(q.id)}.</span> ${q.promptHtml || escapeHtml(q.prompt)}</div>
+                        <div class="tf-ng-row">
+                            <button type="button" data-val="T">True</button>
+                            <button type="button" data-val="F">False</button>
+                            <button type="button" data-val="NG">Not Given</button>
+                        </div>
+                        <div class="tf-feedback" id="tf-${escapeHtml(q.id)}"></div>
+                    </li>
+                `).join('') + `</ul>`;
+            } else if (ex.type === 'short_answer') {
+                bodyHtml = `<ul class="question-list">` + ex.questions.map(q => `
+                    <li data-qid="${escapeHtml(q.id)}">
+                        <div class="q-text"><span class="q-num">${escapeHtml(q.id)}.</span> ${q.promptHtml || escapeHtml(q.prompt)}</div>
+                        <div class="sa-row">
+                            <input type="text" class="sa-input" data-qid="${escapeHtml(q.id)}" placeholder="Your answer">
+                            <span class="correct-mark">✓</span>
+                            <span class="wrong-mark">✗</span>
+                        </div>
+                        <div class="feedback-text" id="fb-${escapeHtml(q.id)}"></div>
+                    </li>
+                `).join('') + `</ul>`;
+            }
+
+            card.innerHTML = `
+                <div class="exercise-header">
+                    <div class="exercise-title"><span>${idx + 1}</span> ${escapeHtml(ex.title)}</div>
+                    <span class="score-badge" id="score-ex-${idx}">0 / ${qCount}</span>
+                </div>
+                ${bodyHtml}
+            `;
+            container.appendChild(card);
+        });
+
+        // Wire option buttons
+        container.querySelectorAll('.option-buttons, .tf-ng-row').forEach(group => {
+            group.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    group.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+        });
+
+        // Reset score display & show action bar
+        const totalQuestions = (data.exercises || []).reduce((sum, ex) => sum + countQuestions(ex), 0);
+        const totalEl = document.getElementById('totalScore');
+        totalEl.classList.remove('visible');
+        totalEl.textContent = `Total: 0 / ${totalQuestions}`;
+        document.getElementById('actionBar').style.display = totalQuestions > 0 ? 'flex' : 'none';
+        document.getElementById('exerciseStack').scrollTop = 0;
+
+        setupScrollObserver();
+    }
+
+    function countQuestions(ex) {
+        if (ex.type === 'note_completion') {
+            return Object.keys(ex.answers || {}).length;
+        }
+        return (ex.questions || []).length;
+    }
+
+    // ---------- CHECK ALL ANSWERS ----------
+    document.getElementById('checkAllBtn').addEventListener('click', function() {
+        if (!currentMockData) return;
+        let totalCorrect = 0;
+        let totalQuestions = 0;
+
+        (currentMockData.exercises || []).forEach((ex, idx) => {
+            let exCorrect = 0;
+            const exTotal = countQuestions(ex);
+            totalQuestions += exTotal;
+
+            if (ex.type === 'multiple_choice') {
+                ex.questions.forEach(q => {
+                    const li = document.querySelector(`li[data-qid="${CSS.escape(String(q.id))}"]`);
+                    const group = li.querySelector('.option-buttons');
+                    const selected = group.querySelector('button.selected');
+                    const fb = document.getElementById('fb-' + q.id);
+
+                    group.querySelectorAll('button').forEach(b => b.classList.remove('correct', 'wrong'));
+
+                    if (selected) {
+                        if (selected.dataset.val === q.answer) {
+                            selected.classList.add('correct');
+                            fb.textContent = 'Correct!';
+                            fb.className = 'feedback-text visible';
+                            exCorrect++;
+                            totalCorrect++;
+                        } else {
+                            selected.classList.add('wrong');
+                            group.querySelectorAll('button').forEach(b => {
+                                if (b.dataset.val === q.answer) b.classList.add('correct');
+                            });
+                            fb.textContent = 'Wrong — correct answer: ' + q.answer;
+                            fb.className = 'feedback-text visible wrong-feedback';
+                        }
+                    } else {
+                        fb.textContent = 'No answer selected.';
+                        fb.className = 'feedback-text visible wrong-feedback';
+                    }
+                });
+            } else if (ex.type === 'note_completion') {
+                Object.entries(ex.answers || {}).forEach(([qId, accepted]) => {
+                    const input = document.querySelector(`.note-input[data-qid="${CSS.escape(String(qId))}"]`);
+                    const mark = document.getElementById('im-' + qId);
+                    const val = normalise(input.value);
+
+                    if (accepted.some(ans => normalise(ans) === val)) {
+                        mark.textContent = '✓';
+                        mark.className = 'inline-mark visible correct';
+                        input.style.borderColor = '#1e9e5a';
+                        exCorrect++;
+                        totalCorrect++;
+                    } else {
+                        mark.textContent = '✗';
+                        mark.className = 'inline-mark visible wrong';
+                        input.style.borderColor = '#d13b3b';
+                    }
+                });
+            } else if (ex.type === 'tf_ng') {
+                ex.questions.forEach(q => {
+                    const li = document.querySelector(`li[data-qid="${CSS.escape(String(q.id))}"]`);
+                    const row = li.querySelector('.tf-ng-row');
+                    const selected = row.querySelector('button.selected');
+                    const fb = document.getElementById('tf-' + q.id);
+
+                    row.querySelectorAll('button').forEach(b => b.classList.remove('correct', 'wrong'));
+
+                    if (selected) {
+                        if (selected.dataset.val === q.answer) {
+                            selected.classList.add('correct');
+                            fb.textContent = 'Correct!';
+                            fb.className = 'tf-feedback visible correct';
+                            exCorrect++;
+                            totalCorrect++;
+                        } else {
+                            selected.classList.add('wrong');
+                            row.querySelectorAll('button').forEach(b => {
+                                if (b.dataset.val === q.answer) b.classList.add('correct');
+                            });
+                            fb.textContent = 'Wrong — correct answer: ' + q.answer;
+                            fb.className = 'tf-feedback visible wrong';
+                        }
+                    } else {
+                        fb.textContent = 'No answer selected.';
+                        fb.className = 'tf-feedback visible wrong';
+                    }
+                });
+            } else if (ex.type === 'short_answer') {
+                ex.questions.forEach(q => {
+                    const input = document.querySelector(`.sa-input[data-qid="${CSS.escape(String(q.id))}"]`);
+                    const li = input.closest('li');
+                    const correctMark = li.querySelector('.correct-mark');
+                    const wrongMark = li.querySelector('.wrong-mark');
+                    const fb = document.getElementById('fb-' + q.id);
+                    const val = normalise(input.value);
+                    const accepted = q.answers || [];
+
+                    if (accepted.some(ans => normalise(ans) === val)) {
+                        correctMark.classList.add('visible');
+                        wrongMark.classList.remove('visible');
+                        fb.textContent = 'Correct!';
+                        fb.className = 'feedback-text visible';
+                        input.style.borderColor = '#1e9e5a';
+                        exCorrect++;
+                        totalCorrect++;
+                    } else if (val === '') {
+                        correctMark.classList.remove('visible');
+                        wrongMark.classList.remove('visible');
+                        fb.textContent = 'No answer given.';
+                        fb.className = 'feedback-text visible wrong-feedback';
+                        input.style.borderColor = '#d13b3b';
+                    } else {
+                        correctMark.classList.remove('visible');
+                        wrongMark.classList.add('visible');
+                        fb.textContent = 'Wrong — correct answer: ' + accepted[0];
+                        fb.className = 'feedback-text visible wrong-feedback';
+                        input.style.borderColor = '#d13b3b';
+                    }
+                });
+            }
+
+            const badge = document.getElementById('score-ex-' + idx);
+            badge.textContent = `${exCorrect} / ${exTotal}`;
+            badge.classList.add('visible');
+        });
+
+        const totalEl = document.getElementById('totalScore');
+        totalEl.textContent = `Total: ${totalCorrect} / ${totalQuestions}`;
+        totalEl.classList.add('visible');
+    });
+
+    // ---------- RESET ----------
+    document.getElementById('resetAllBtn').addEventListener('click', function() {
+        if (currentMockData) renderMock(currentMockData);
+    });
+
+    // ---------- SCROLL HIGHLIGHT ----------
+    function setupScrollObserver() {
+        if (intersectionObserver) intersectionObserver.disconnect();
+        const cards = document.querySelectorAll('.exercise-card');
+        intersectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    cards.forEach(c => c.classList.remove('active'));
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.4 });
+        cards.forEach(card => intersectionObserver.observe(card));
+    }
+
+    // ---------- DRAG RESIZER ----------
+    (function() {
+        const container = document.getElementById('mainContainer');
+        const videoCol = document.getElementById('videoColumn');
+        const resizer = document.getElementById('resizer');
+        const exerciseCol = document.getElementById('exerciseStack');
+
+        let isDragging = false;
+        let startX = 0;
+        let startVideoWidth = 0;
+        let startExerciseWidth = 0;
+
+        function startDrag(clientX) {
+            isDragging = true;
+            startX = clientX;
+            startVideoWidth = videoCol.getBoundingClientRect().width;
+            startExerciseWidth = exerciseCol.getBoundingClientRect().width;
+            resizer.classList.add('dragging');
+            document.body.style.userSelect = 'none';
+        }
+
+        function onDrag(clientX) {
+            if (!isDragging) return;
+            const deltaX = clientX - startX;
+            const newVideoWidth = startVideoWidth + deltaX;
+            const newExerciseWidth = startExerciseWidth - deltaX;
+            const minWidth = 280;
+            const maxWidth = container.getBoundingClientRect().width - minWidth - 10;
+
+            if (newVideoWidth >= minWidth && newVideoWidth <= maxWidth && newExerciseWidth >= minWidth) {
+                videoCol.style.flex = '0 0 ' + newVideoWidth + 'px';
+                videoCol.style.width = newVideoWidth + 'px';
+                exerciseCol.style.flex = '1 1 ' + newExerciseWidth + 'px';
+            }
+        }
+
+        function stopDrag() {
+            if (isDragging) {
+                isDragging = false;
+                resizer.classList.remove('dragging');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
+        }
+
+        resizer.addEventListener('mousedown', e => {
+            startDrag(e.clientX);
+            document.body.style.cursor = 'col-resize';
+            e.preventDefault();
+        });
+        window.addEventListener('mousemove', e => onDrag(e.clientX));
+        window.addEventListener('mouseup', stopDrag);
+
+        resizer.addEventListener('touchstart', e => {
+            startDrag(e.touches[0].clientX);
+            e.preventDefault();
+        }, { passive: false });
+        window.addEventListener('touchmove', e => {
+            if (!isDragging) return;
+            onDrag(e.touches[0].clientX);
+            e.preventDefault();
+        }, { passive: false });
+        window.addEventListener('touchend', stopDrag);
+    })();
+
+    initApp();
+</script>
+
+</body>
+</html>
